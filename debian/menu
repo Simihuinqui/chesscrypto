@@ -1,0 +1,6 @@
+?package(chesscrypto):needs="X11" \
+ section="Games/Board" \
+ title="ChessCrypto" \
+ longtitle="ChessCrypto - chess graphical user interface for several chess engines" \
+ command="/usr/games/ChessCrypto" \
+ icon="/usr/share/pixmaps/chesscrypto.xpm"
