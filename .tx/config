@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com ?
+
+[chesscrypto.chesscrypto]
+file_filter = lang/<lang>/LC_MESSAGES/chesscrypto.po
+source_file = lang/chesscrypto.pot
+source_lang = en
+
