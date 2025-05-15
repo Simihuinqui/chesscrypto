@@ -1,0 +1,14 @@
+#!/bin/sh
+
+cp ~/.config/chesscrypto/config ~/.config/chesscrypto/config.saved
+rm ~/.config/chesscrypto/config
+
+cd ~/chesscrypto
+LANG=C PYTHONPATH=~/storytext/lib ~/storytext/bin/storytext \
+	--interface=gtk3 \
+	--delay=1 \
+	--mapfiles=testing/storytext/ui_map.conf \
+	--replay=testing/storytext/"$1" \
+./chesscrypto
+
+cp ~/.config/chesscrypto/config.saved ~/.config/chesscrypto/config
