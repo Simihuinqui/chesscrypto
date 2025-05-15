@@ -1,0 +1,82 @@
+# Copyright (C) 2025 Inti Simihuinqui <x.com/Simihuinqui>
+# Licensed under GPL v3 or later
+
+name: Run the test suite
+
+# Drop permissions to minimum for security
+permissions:
+  contents: read
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 2 * * 5'  # Every Friday at 2am
+
+jobs:
+  run-tests:
+    name: Run the test suite
+    strategy:
+      matrix:
+        python-version: [3.9, 3.12]  # no particular need for in-between versions
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+    - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        set -x
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends --yes -V \
+            gettext \
+            gir1.2-gdkpixbuf-2.0 \
+            gir1.2-glib-2.0 \
+            gir1.2-gstreamer-1.0 \
+            gir1.2-gtk-3.0 \
+            gir1.2-gtksource-3.0 \
+            gir1.2-pango-1.0 \
+            gir1.2-rsvg-2.0 \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            libcairo2-dev \
+            libgdk-pixbuf-2.0-dev \
+            libgirepository-2.0-dev \
+            librsvg2-common \
+            stockfish \
+            xvfb
+
+    - name: Install from sources
+      run: |
+        set -x
+        python3 --version
+        python3 -m venv venv
+        source venv/bin/activate
+
+        pip3 install -U pip setuptools wheel
+        pip3 install -r requirements.txt
+        diff -u0 <(sed -e 's,#.*,,' -e '/^$/d' < requirements.txt | sort -f) <(pip3 freeze | sed -e '/^setuptools==/d' -e '/^wheel==/d' | sort -f)  # enforces complete pinning
+
+        time PYTHONPATH=lib python3 pgn2ecodb.py
+        time PYTHONPATH=lib python3 create_theme_preview.py
+
+        pip3 install -e .
+
+        chesscrypto --help  # smoke test
+
+    - name: Run the test suite (with virtual X11 server)
+      run: |
+        set -x
+        source venv/bin/activate
+
+        export DISPLAY=:1
+        Xvfb "${DISPLAY}" &
+        xvfb_pid=$!
+
+        cd testing
+        ./run3 run_tests.py
+
+        kill -s SIGTERM "${xvfb_pid}"
