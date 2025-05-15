@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=ChessCrypto
+Comment=ChessCrypto is a fully featured, nice looking, easy to use chess client for the Gnome desktop
+GenericName=Chess Game
+Icon=chesscrypto
+Exec=env UBUNTU_MENUPROXY= chesscrypto
+Terminal=false
+Categories=Game;BoardGame;
+MimeType=application/x-chess-pgn;application/x-chess-epd;application/x-chess-fen;application/x-chess-chesscrypto;

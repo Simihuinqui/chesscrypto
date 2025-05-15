@@ -1,0 +1,10 @@
+include glade/*.glade glade/background.jpg glade/*.png glade/*.svg glade/16x16/*.png glade/48x48/*.png flags/*.png boards/*.png
+recursive-include pieces *
+include README.md AUTHORS ARTISTS DOCUMENTERS LICENSE INSTALL TRANSLATORS
+include sounds/*.ogg
+include learn/lectures/*.txt learn/lessons/*.pgn learn/lessons/*.sqlite learn/puzzles/*.pgn learn/puzzles/*.sqlite learn/puzzles/*.olv
+include manpages/chesscrypto.1.gz
+include gtksourceview-3.0/language-specs/pgn.lang
+include chesscrypto_book.bin eco.db pgn2ecodb.py create_theme_preview.py
+include chesscrypto.desktop chesscrypto.svg chessc.png chesscrypto.metainfo.xml chesscrypto.xml
+recursive-include lang *.po
