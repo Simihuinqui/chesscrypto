@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChessCrypto</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    #board {
+      width: 480px;
+      margin: 20px auto;
+    }
+    button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.css" />
+</head>
+<body>
+  <h1>? ChessCrypto</h1>
+  <div id="board"></div>
+  <div>
+    <button onclick="startStandard()">Nueva partida estándar</button>
+    <button onclick="start960()">Nueva partida Chess960</button>
+  </div>
+
+  <script src="https://unpkg.com/chess.js@1.0.0/chess.js"></script>
+  <script src="https://unpkg.com/@chrisoakman/chessboardjs/dist/chessboard-1.0.0.min.js"></script>
+  <script>
+    let board, game;
+
+    function startStandard() {
+      game = new Chess();
+      board.position(game.fen());
+    }
+
+    function start960() {
+      game = new Chess();
+      const base = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'];
+      let backRank = Array(8).fill(null);
+
+      // Coloca los alfiles en casillas opuestas de color
+      let dark = [0, 2, 4, 6], light = [1, 3, 5, 7];
+      backRank[dark.splice(Math.floor(Math.random() * dark.length), 1)] = 'b';
+      backRank[light.splice(Math.floor(Math.random() * light.length), 1)] = 'b';
+
+      // Reina en casilla aleatoria restante
+      let empty = backRank.map((p, i) => p === null ? i : null).filter(i => i !== null);
+      backRank[empty.splice(Math.floor(Math.random() * empty.length), 1)] = 'q';
+
+      // Caballos
+      empty = backRank.map((p, i) => p === null ? i : null).filter(i => i !== null);
+      for (let i = 0; i < 2; i++) {
+        backRank[empty.splice(Math.floor(Math.random() * empty.length), 1)] = 'n';
+      }
+
+      // Torre - Rey - Torre (garantizando posición correcta para enroque)
+      empty = backRank.map((p, i) => p === null ? i : null).filter(i => i !== null);
+      empty.sort(() => Math.random() - 0.5);
+      backRank[empty[0]] = 'r';
+      backRank[empty[1]] = 'k';
+      backRank[empty[2]] = 'r';
+
+      const white = backRank.join('');
+      const black = white.toUpperCase();
+      const fen960 = `${white}/pppppppp/8/8/8/8/PPPPPPPP/${black} w KQkq - 0 1`;
+      game.load(fen960);
+      board.position(game.fen());
+    }
+
+    function onDragStart(source, piece) {
+      if (game.game_over()) return false;
+      if ((game.turn() === 'w' && piece.startsWith('b')) ||
+          (game.turn() === 'b' && piece.startsWith('w'))) {
+        return false;
+      }
+    }
+
+    function onDrop(source, target) {
+      const move = game.move({ from: source, to: target, promotion: 'q' });
+      if (move === null) return 'snapback';
+    }
+
+    function onSnapEnd() {
+      board.position(game.fen());
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      game = new Chess();
+      board = Chessboard('board', {
+        position: 'start',
+        draggable: true,
+        onDragStart,
+        onDrop,
+        onSnapEnd,
+      });
+    });
+  </script>
+</body>
+</html>
